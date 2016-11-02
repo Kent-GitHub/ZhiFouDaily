@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.kent.zhifoudaily.ui.view.ShadowImageView
+        android:id="@+id/iv_newest"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:contentDescription="@string/contentDescription"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tv_newest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:padding="16dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="#ffffffff"
+        android:textSize="21sp" />
+
+</FrameLayout>

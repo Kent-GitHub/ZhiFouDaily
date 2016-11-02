@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ZhiFouDaily</string>
+    <string name="contentDescription">contentDescription</string>
+    <string name="zhiFou">知否日报</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">设置选项</string>
+    <string name="action_night_yes">夜间模式</string>
+    <string name="action_night_no">日间模式</string>
+    <string name="action_notification">通知</string>
+    <string name="multiPic">多图</string>
+</resources>
