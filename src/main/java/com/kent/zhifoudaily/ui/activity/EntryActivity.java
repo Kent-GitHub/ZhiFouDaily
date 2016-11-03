@@ -10,13 +10,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.kent.zhifoudaily.R;
-import com.kent.zhifoudaily.entity.WelcomeImage;
+import com.kent.zhifoudaily.entity.StartImage;
 import com.kent.zhifoudaily.retrofit.ZhiHuHttpHelper;
 
 import rx.Subscriber;
@@ -29,7 +30,7 @@ public class EntryActivity extends Activity {
     private static final String TAG = "EntryActivity";
 
 //    private static final int animationTime = 2000;
-    private static final int animationTime = 1000;
+    private static final int animationTime = 2000;
 
     private static final float scaleMax = 1.13F;
 
@@ -43,7 +44,7 @@ public class EntryActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS|WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         getLauncherImage();
 
         mImageView = (ImageView) findViewById(R.id.iv_splash);
@@ -61,7 +62,7 @@ public class EntryActivity extends Activity {
                         mHandler.sendEmptyMessageDelayed(0,delayTime);
                     }
                 })
-                .subscribe(new Subscriber<WelcomeImage>() {
+                .subscribe(new Subscriber<StartImage>() {
                     @Override
                     public void onCompleted() {
 
@@ -75,7 +76,7 @@ public class EntryActivity extends Activity {
                     }
 
                     @Override
-                    public void onNext(WelcomeImage welcomeImage) {
+                    public void onNext(StartImage welcomeImage) {
                         if (welcomeImage != null) {
                             mTextView.setText(welcomeImage.getText());
                             Glide.with(EntryActivity.this).load(welcomeImage.getImg())

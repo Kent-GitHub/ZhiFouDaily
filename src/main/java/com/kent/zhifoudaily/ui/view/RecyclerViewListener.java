@@ -14,7 +14,6 @@ import java.util.List;
 public class RecyclerViewListener extends RecyclerView.OnScrollListener {
     private int lastPosition;
     private List<String> mDates;
-
     private MainActivity activity;
 
     public RecyclerViewListener(Activity activity) {
@@ -29,12 +28,14 @@ public class RecyclerViewListener extends RecyclerView.OnScrollListener {
         StoriesAdapter mAdapter = (StoriesAdapter) recyclerView.getAdapter();
         int position = layoutManager.findFirstVisibleItemPosition() - mAdapter.getHeaderLayoutCount();
         List<NewsLatest.StoriesBean> data = mAdapter.getData();
-        if (data.size() == 0 ) return;
-        if (position<0){
-            activity.setTitle("首页");
-        }else {
-            activity.setTitle(data.get(position).getHeaderDate());
+        if (data.size() == 0) return;
+        if (lastPosition != position) {
+            if (position < 0) {
+                activity.setTitle("首页");
+            } else {
+                activity.setTitle(data.get(position).getHeaderDate());
+            }
         }
-
+        lastPosition = position;
     }
 }

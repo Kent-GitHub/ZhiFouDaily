@@ -83,6 +83,8 @@ public class NewsLatest {
             this.isHeaderDate = isHeader;
         }
 
+        public StoriesBean(){}
+
         private String headerDate;
         private boolean isHeaderDate;
 

@@ -7,7 +7,7 @@ import org.json.JSONObject;
  * Created by Kent ↗↗↗ on 2016/10/31.
  */
 
-public class WelcomeImage {
+public class StartImage {
 
     /**
      * text : Alex Blăjan
@@ -17,12 +17,12 @@ public class WelcomeImage {
     private String text;
     private String img;
 
-    public static WelcomeImage objectFromData(String str, String key) {
+    public static StartImage objectFromData(String str, String key) {
 
         try {
             JSONObject jsonObject = new JSONObject(str);
 
-            return new com.google.gson.Gson().fromJson(jsonObject.getString(str), WelcomeImage.class);
+            return new com.google.gson.Gson().fromJson(jsonObject.getString(str), StartImage.class);
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,7 @@
 package com.kent.zhifoudaily.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -29,6 +31,7 @@ import com.kent.zhifoudaily.entity.NewsBefore;
 import com.kent.zhifoudaily.entity.NewsLatest;
 import com.kent.zhifoudaily.retrofit.ZhiHuHttpHelper;
 import com.kent.zhifoudaily.ui.view.RecyclerViewListener;
+import com.kent.zhifoudaily.utils.BarUtils;
 import com.kent.zhifoudaily.utils.ScreenUtils;
 import com.rd.PageIndicatorView;
 
@@ -50,16 +53,21 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
+                if (mRecyclerView!=null){
+                    mRecyclerView.scrollToPosition(0);
+                }
             }
         });
 
@@ -297,5 +305,4 @@ public class MainActivity extends AppCompatActivity
             return "星期" + dayOfWeek;
         }
     }
-
 }

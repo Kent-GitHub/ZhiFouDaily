@@ -2,13 +2,15 @@ package com.kent.zhifoudaily.retrofit;
 
 import android.annotation.SuppressLint;
 
+import com.kent.zhifoudaily.entity.Comment;
+import com.kent.zhifoudaily.entity.News;
 import com.kent.zhifoudaily.entity.NewsBefore;
 import com.kent.zhifoudaily.entity.NewsLatest;
-import com.kent.zhifoudaily.entity.WelcomeImage;
+import com.kent.zhifoudaily.entity.StartImage;
+import com.kent.zhifoudaily.entity.StoryExtra;
 
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import retrofit2.Retrofit;
@@ -46,7 +48,7 @@ public class ZhiHuHttpHelper {
         return ZhiHuHttpHolder.INSTANCE;
     }
 
-    public Observable<WelcomeImage> getWelcomeImage(String resolution) {
+    public Observable<StartImage> getWelcomeImage(String resolution) {
         return zhiHuApi.getWelcomeImage(resolution);
     }
 
@@ -58,5 +60,21 @@ public class ZhiHuHttpHelper {
     public Observable<NewsBefore> getNewsBefore(int dayBefore) {
         Date date = new Date(new Date().getTime() - dayBefore * 24 * 60 * 60 * 1000);
         return zhiHuApi.getNewsBefore(new SimpleDateFormat("yyyyMMdd").format(date));
+    }
+
+    public Observable<News> getNews(int id) {
+        return zhiHuApi.getNews(id);
+    }
+
+    public Observable<StoryExtra> getStoryExtra(int id) {
+        return zhiHuApi.getStoryExtra(id);
+    }
+
+    public Observable<Comment> getLongComment(int id) {
+        return zhiHuApi.getLongComment(id);
+    }
+
+    public Observable<Comment> getShortComment(int id) {
+        return zhiHuApi.getShortComment(id);
     }
 }

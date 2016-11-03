@@ -1,7 +1,9 @@
 package com.kent.zhifoudaily.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.kent.zhifoudaily.R;
 import com.kent.zhifoudaily.entity.NewsLatest;
+import com.kent.zhifoudaily.ui.activity.NewsDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +46,7 @@ public class TopStoriesAdapter extends PagerAdapter {
     }
 
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(ViewGroup container, final int position) {
         NewsLatest.TopStoriesBean story = mTopStories.get(position);
         ViewGroup view = (ViewGroup) LayoutInflater.from(mContext).inflate(R.layout.layout_top_story, container, false);
         ImageView iv = (ImageView) view.findViewById(R.id.iv_newest);
@@ -53,7 +56,7 @@ public class TopStoriesAdapter extends PagerAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                NewsDetailActivity.Lunch((Activity) mContext, convertToStories(), position);
             }
         });
         container.addView(view);
@@ -68,5 +71,21 @@ public class TopStoriesAdapter extends PagerAdapter {
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view == object;
+    }
+
+    private List<NewsLatest.StoriesBean> convertToStories() {
+        List<NewsLatest.StoriesBean> stories = new ArrayList<>();
+        for (NewsLatest.TopStoriesBean topStory : mTopStories) {
+            NewsLatest.StoriesBean story = new NewsLatest.StoriesBean();
+            story.setType(topStory.getType());
+            story.setId(topStory.getId());
+            story.setGa_prefix(topStory.getGa_prefix());
+            List<String> images = new ArrayList<>();
+            images.add(topStory.getImage());
+            story.setImages(images);
+            stories.add(story);
+        }
+        Log.e("Test", "convertToStories_mTopStories: "+mTopStories.size()+" ,stories: "+stories.size() );
+        return stories;
     }
 }
