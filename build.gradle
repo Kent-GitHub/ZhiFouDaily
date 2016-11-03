@@ -51,6 +51,7 @@ dependencies {
     //ViewPager Indicator
     compile 'com.romandanylyk:pageindicatorview:0.0.6'
     //RecyclerViewAdapterHelper
+    //工程build.gradle allprojects { repositories { jcenter() maven { url "https://jitpack.io" } } }
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.4.4'
     //RecyclerView Divider
     compile 'com.yqritc:recyclerview-flexibledivider:1.4.0'
