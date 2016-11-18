@@ -16,4 +16,7 @@
     <string name="no_comment_yet">还没有评论哦...</string>
     <string name="editor">主编</string>
     <string name="mars">Mars</string>
+    <string name="do_login">请登录</string>
+    <string name="my_fav">我的收藏</string>
+    <string name="down_offLine">离线下载</string>
 </resources>

@@ -179,7 +179,8 @@ public class NewsDetailActivity extends AppCompatActivity {
             mTitle.setText(news.getTitle());
             mImageSource.setText(news.getImage_source());
         } else {
-            mImageView.getLayoutParams().height = BarUtils.getActionBarHeight2(this);
+            //findViewById(R.id.news_detail_holder).getLayoutParams().height = BarUtils.getActionBarHeight2(this)
+            //        + Build.VERSION.SDK_INT >= 21 ? BarUtils.getStatusBarHeight(this) : 0;
             TextView title2 = (TextView) findViewById(R.id.news_detail_title2);
             title2.setVisibility(View.VISIBLE);
             title2.setText(news.getTitle());
