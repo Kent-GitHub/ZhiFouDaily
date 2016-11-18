@@ -8,6 +8,8 @@ import com.kent.zhifoudaily.entity.NewsBefore;
 import com.kent.zhifoudaily.entity.NewsLatest;
 import com.kent.zhifoudaily.entity.StartImage;
 import com.kent.zhifoudaily.entity.StoryExtra;
+import com.kent.zhifoudaily.entity.Theme;
+import com.kent.zhifoudaily.entity.Themes;
 
 
 import java.text.SimpleDateFormat;
@@ -18,10 +20,6 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 import rx.Observable;
-
-/**
- * Created by Kent ↗↗↗ on 2016/10/31.
- */
 
 public class ZhiHuHttpHelper {
     private static final String BaseUrl = "http://news-at.zhihu.com/api/4/";
@@ -76,5 +74,13 @@ public class ZhiHuHttpHelper {
 
     public Observable<Comment> getShortComment(int id) {
         return zhiHuApi.getShortComment(id);
+    }
+
+    public Observable<Themes> getThemes() {
+        return zhiHuApi.getThemes();
+    }
+
+    public Observable<Theme> getTheme(int id) {
+        return zhiHuApi.getTheme(id);
     }
 }

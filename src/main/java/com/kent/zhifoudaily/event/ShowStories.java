@@ -1,14 +1,15 @@
 package com.kent.zhifoudaily.event;
 
 import com.kent.zhifoudaily.entity.NewsLatest;
+import com.kent.zhifoudaily.entity.StoriesBean;
 
 import java.util.List;
 
 public class ShowStories {
     private int current;
-    private List<NewsLatest.StoriesBean> mStories;
+    private List<StoriesBean> mStories;
 
-    public ShowStories(List<NewsLatest.StoriesBean> mStories, int current) {
+    public ShowStories(List<StoriesBean> mStories, int current) {
         this.mStories = mStories;
         this.current = current;
     }
@@ -17,7 +18,7 @@ public class ShowStories {
         return current;
     }
 
-    public List<NewsLatest.StoriesBean> getStories() {
+    public List<StoriesBean> getStories() {
         return mStories;
     }
 }

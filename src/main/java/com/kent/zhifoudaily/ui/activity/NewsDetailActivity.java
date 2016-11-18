@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.ImageView;
@@ -21,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.kent.zhifoudaily.R;
 import com.kent.zhifoudaily.entity.News;
 import com.kent.zhifoudaily.entity.NewsLatest;
+import com.kent.zhifoudaily.entity.StoriesBean;
 import com.kent.zhifoudaily.entity.StoryExtra;
 import com.kent.zhifoudaily.event.ShowStories;
 import com.kent.zhifoudaily.retrofit.ZhiHuHttpHelper;
@@ -44,8 +47,8 @@ import rx.schedulers.Schedulers;
 
 public class NewsDetailActivity extends AppCompatActivity {
     private static final String TAG = "NewsDetailActivity";
-    private List<NewsLatest.StoriesBean> mStories;
-    private int currentPage,newsId;
+    private List<StoriesBean> mStories;
+    private int currentPage, newsId;
     private ActionBar mActionBar;
     private WebView mWebView;
     private ImageView mImageView;
@@ -83,7 +86,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         mImageSource = (TextView) findViewById(R.id.news_detail_image_source);
     }
 
-    public static void Lunch(Activity from, List<NewsLatest.StoriesBean> mStories, int current) {
+    public static void Lunch(Activity from, List<StoriesBean> mStories, int current) {
         Intent intent = new Intent(from, NewsDetailActivity.class);
         intent.putExtra("newsId", mStories.get(current).getId());
         from.startActivity(intent);
@@ -105,7 +108,7 @@ public class NewsDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_action_comment:
-                if (newsId==-1)return true;
+                if (newsId == -1) return true;
                 CommentActivity.Launch(this, newsId);
                 break;
             case android.R.id.home:
@@ -117,10 +120,11 @@ public class NewsDetailActivity extends AppCompatActivity {
 
     @Subscribe
     public void onReceiveStories(ShowStories showStories) {
+        // TODO: 2016/11/5 并不能收到
         Log.e(TAG, "onReceiveStories: get stories.");
         mStories = showStories.getStories();
         currentPage = showStories.getCurrent();
-        NewsLatest.StoriesBean story = mStories.get(currentPage);
+        StoriesBean story = mStories.get(currentPage);
         mTitle.setText(story.getTitle());
         requestNews(story.getId());
     }
@@ -170,10 +174,16 @@ public class NewsDetailActivity extends AppCompatActivity {
     }
 
     private void updateNews(News news) {
-        Glide.with(this).load(news.getImage())
-                .into(mImageView);
-        mTitle.setText(news.getTitle());
-        mImageSource.setText(news.getImage_source());
+        if (news.getImage() != null) {
+            Glide.with(this).load(news.getImage()).into(mImageView);
+            mTitle.setText(news.getTitle());
+            mImageSource.setText(news.getImage_source());
+        } else {
+            mImageView.getLayoutParams().height = BarUtils.getActionBarHeight2(this);
+            TextView title2 = (TextView) findViewById(R.id.news_detail_title2);
+            title2.setVisibility(View.VISIBLE);
+            title2.setText(news.getTitle());
+        }
         String htmlData = HtmlUtil.createHtmlData(news);
         mWebView.loadData(htmlData, HtmlUtil.MIME_TYPE, HtmlUtil.ENCODING);
     }
@@ -185,8 +195,8 @@ public class NewsDetailActivity extends AppCompatActivity {
         BadgeStyle translucent = new BadgeStyle(BadgeStyle.Style.DEFAULT,
                 com.mikepenz.actionitembadge.library.R.layout.menu_action_item_badge,
                 0x00888888, 0x00888888, Color.WHITE);
-        ActionItemBadge.update(this, menuShare, FontAwesome.Icon.faw_share, translucent, "");
         ActionItemBadge.update(this, menuFav, FontAwesome.Icon.faw_star, translucent, "");
+        ActionItemBadge.update(this, menuShare, FontAwesome.Icon.faw_share, translucent, "");
         ActionItemBadge.update(this, menuComment, FontAwesome.Icon.faw_comments, style, storyExtra.getComments());
         ActionItemBadge.update(this, menuPraise, getResources().getDrawable(R.drawable.praise), style, storyExtra.getPopularity());
     }

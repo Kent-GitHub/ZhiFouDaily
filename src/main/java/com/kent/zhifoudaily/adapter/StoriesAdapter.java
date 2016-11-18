@@ -9,33 +9,35 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.kent.zhifoudaily.entity.NewsLatest;
+import com.kent.zhifoudaily.entity.StoriesBean;
 import com.kent.zhifoudaily.ui.view.NewestStoryView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StoriesAdapter extends BaseQuickAdapter<NewsLatest.StoriesBean, BaseViewHolder> {
+public class StoriesAdapter extends BaseQuickAdapter<StoriesBean, BaseViewHolder> {
     private Context mContext;
     private static final int TypeDate = 0x001;
     private static final int TypeNormal = 0x002;
 
-    public StoriesAdapter(Context context, List<NewsLatest.StoriesBean> data) {
+    public StoriesAdapter(Context context, List<StoriesBean> data) {
         super(data);
         mContext = context;
     }
 
     public StoriesAdapter(Context mContext) {
-        super(new ArrayList<NewsLatest.StoriesBean>());
+        super(new ArrayList<StoriesBean>());
         this.mContext = mContext;
     }
 
-    public StoriesAdapter(int layoutResId, List<NewsLatest.StoriesBean> data, Context mContext) {
+    public StoriesAdapter(int layoutResId, List<StoriesBean> data, Context mContext) {
         super(layoutResId, data);
         this.mContext = mContext;
+
     }
 
     @Override
-    protected void convert(BaseViewHolder baseViewHolder, NewsLatest.StoriesBean storiesBean) {
+    protected void convert(BaseViewHolder baseViewHolder, StoriesBean storiesBean) {
         if (!storiesBean.isHeaderDate()) {
             ((NewestStoryView) baseViewHolder.getConvertView()).setData(storiesBean);
         } else {

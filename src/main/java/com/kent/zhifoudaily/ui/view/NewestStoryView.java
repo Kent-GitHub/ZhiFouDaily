@@ -10,12 +10,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.kent.zhifoudaily.R;
-import com.kent.zhifoudaily.entity.NewsLatest;
+import com.kent.zhifoudaily.entity.StoriesBean;
+import com.kent.zhifoudaily.utils.ConvertUtils;
 import com.kent.zhifoudaily.utils.ScreenUtils;
 
-/**
- * Created by Kent ↗↗↗ on 2016/11/1.
- */
+import java.util.List;
 
 public class NewestStoryView extends CardView {
 
@@ -23,14 +22,17 @@ public class NewestStoryView extends CardView {
     private TextView mTitle, multiPic;
 
     private Context mContext;
+    private int eightDp;
 
     public NewestStoryView(Context context) {
         super(context);
         mContext = context;
+        eightDp = ConvertUtils.dp2px(mContext, 8);
         LayoutInflater.from(context).inflate(R.layout.layout_newest_story, this);
         setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         FrameLayout.LayoutParams layoutParams = (LayoutParams) getLayoutParams();
-        layoutParams.setMargins(16,8,16,8);
+        layoutParams.setMargins(eightDp, eightDp, eightDp, eightDp);
+        setMinimumHeight(ConvertUtils.dp2px(mContext, 80));
         init();
     }
 
@@ -45,8 +47,15 @@ public class NewestStoryView extends CardView {
         this.multiPic.setVisibility(isMultiPic ? VISIBLE : INVISIBLE);
     }
 
-    public void setData(NewsLatest.StoriesBean data) {
-        Glide.with(mContext).load(data.getImages().get(0)).into(mImageView);
+    public void setData(StoriesBean data) {
+        List<String> images = data.getImages();
+        if (images != null) {
+            String string = images.get(0);
+            Glide.with(mContext).load(string).into(mImageView);
+            mImageView.setVisibility(VISIBLE);
+        } else {
+            mImageView.setVisibility(GONE);
+        }
         mTitle.setText(data.getTitle());
         isMultiPic(data.isMultipic());
     }

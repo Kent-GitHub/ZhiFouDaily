@@ -19,6 +19,7 @@
 
             <FrameLayout
                 android:fitsSystemWindows="true"
+                android:id="@+id/news_detail_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_collapseMode="parallax"
@@ -27,7 +28,7 @@
                 <com.kent.zhifoudaily.ui.view.ShadowImageView
                     android:id="@+id/news_detail_image"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="36dp"
                     android:contentDescription="@string/contentDescription"
                     android:scaleType="centerCrop"/>
 
@@ -70,15 +71,25 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/news_detail_title2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:gravity="start"
+                android:textColor="#000"
+                android:textSize="21sp"
+                android:padding="16dp"/>
             <WebView
                 android:id="@+id/news_detail_webView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-        </FrameLayout>
+        </LinearLayout>
         <!--<TextView-->
         <!--android:visibility="gone"-->
         <!--android:layout_width="wrap_content"-->

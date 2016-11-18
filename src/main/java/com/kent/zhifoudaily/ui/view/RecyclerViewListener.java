@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.kent.zhifoudaily.adapter.StoriesAdapter;
 import com.kent.zhifoudaily.entity.NewsLatest;
+import com.kent.zhifoudaily.entity.StoriesBean;
 import com.kent.zhifoudaily.ui.activity.MainActivity;
 
 import java.util.ArrayList;
@@ -27,12 +28,12 @@ public class RecyclerViewListener extends RecyclerView.OnScrollListener {
         LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         StoriesAdapter mAdapter = (StoriesAdapter) recyclerView.getAdapter();
         int position = layoutManager.findFirstVisibleItemPosition() - mAdapter.getHeaderLayoutCount();
-        List<NewsLatest.StoriesBean> data = mAdapter.getData();
+        List<StoriesBean> data = mAdapter.getData();
         if (data.size() == 0) return;
         if (lastPosition != position) {
             if (position < 0) {
                 activity.setTitle("首页");
-            } else {
+            } else if (data.get(position).getHeaderDate()!=null){
                 activity.setTitle(data.get(position).getHeaderDate());
             }
         }

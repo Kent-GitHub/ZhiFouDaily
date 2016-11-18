@@ -13,14 +13,11 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.kent.zhifoudaily.R;
 import com.kent.zhifoudaily.entity.NewsLatest;
+import com.kent.zhifoudaily.entity.StoriesBean;
 import com.kent.zhifoudaily.ui.activity.NewsDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * Created by Kent ↗↗↗ on 2016/11/1.
- */
 
 public class TopStoriesAdapter extends PagerAdapter {
     private Context mContext;
@@ -73,10 +70,10 @@ public class TopStoriesAdapter extends PagerAdapter {
         return view == object;
     }
 
-    private List<NewsLatest.StoriesBean> convertToStories() {
-        List<NewsLatest.StoriesBean> stories = new ArrayList<>();
+    private List<StoriesBean> convertToStories() {
+        List<StoriesBean> stories = new ArrayList<>();
         for (NewsLatest.TopStoriesBean topStory : mTopStories) {
-            NewsLatest.StoriesBean story = new NewsLatest.StoriesBean();
+            StoriesBean story = new StoriesBean();
             story.setType(topStory.getType());
             story.setId(topStory.getId());
             story.setGa_prefix(topStory.getGa_prefix());

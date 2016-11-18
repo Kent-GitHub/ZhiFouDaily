@@ -6,6 +6,8 @@ import com.kent.zhifoudaily.entity.NewsBefore;
 import com.kent.zhifoudaily.entity.NewsLatest;
 import com.kent.zhifoudaily.entity.StartImage;
 import com.kent.zhifoudaily.entity.StoryExtra;
+import com.kent.zhifoudaily.entity.Theme;
+import com.kent.zhifoudaily.entity.Themes;
 
 
 import retrofit2.http.GET;
@@ -38,5 +40,11 @@ public interface ZhiHuInterface {
 
     @GET("story/{id}/short-comments")
     Observable<Comment> getShortComment(@Path("id") int id);
+
+    @GET("themes")
+    Observable<Themes> getThemes();
+
+    @GET("theme/{id}")
+    Observable<Theme> getTheme(@Path("id") int id);
 
 }

@@ -3,8 +3,8 @@ package com.kent.zhifoudaily.ui.activity;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,17 +21,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.kent.zhifoudaily.R;
+import com.kent.zhifoudaily.adapter.GlideCircleTransform;
 import com.kent.zhifoudaily.adapter.StoriesAdapter;
 import com.kent.zhifoudaily.adapter.TopStoriesAdapter;
 import com.kent.zhifoudaily.entity.NewsBefore;
 import com.kent.zhifoudaily.entity.NewsLatest;
+import com.kent.zhifoudaily.entity.StoriesBean;
+import com.kent.zhifoudaily.entity.Theme;
+import com.kent.zhifoudaily.entity.Themes;
 import com.kent.zhifoudaily.retrofit.ZhiHuHttpHelper;
+import com.kent.zhifoudaily.ui.view.ThemeEditorView;
+import com.kent.zhifoudaily.ui.view.ThemeHeader;
 import com.kent.zhifoudaily.ui.view.RecyclerViewListener;
-import com.kent.zhifoudaily.utils.BarUtils;
+import com.kent.zhifoudaily.utils.ConvertUtils;
 import com.kent.zhifoudaily.utils.ScreenUtils;
 import com.rd.PageIndicatorView;
 
@@ -45,6 +57,7 @@ import java.util.List;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity
@@ -65,7 +78,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 //        .setAction("Action", null).show();
-                if (mRecyclerView!=null){
+                if (mRecyclerView != null) {
                     mRecyclerView.scrollToPosition(0);
                 }
             }
@@ -117,22 +130,13 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        if (item.getGroupId() == 1) {
+            themeCurrent = item.getItemId();
+            themeSelected(item.getItemId());
+        } else if (item.getItemId() == R.id.nav_menu_home) {
+            themeCurrent = -1;
+            themeSelected(-1);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -141,42 +145,47 @@ public class MainActivity extends AppCompatActivity
     }
 
     private static final String TAG = "MainActivity";
-    private ViewPager mViewPager;
+    private View mHeaderLayout;
+    private ThemeHeader mThemeHeader;
     private PageIndicatorView mIndicator;
     private List<NewsLatest.TopStoriesBean> mTopStories;
-    private List<NewsLatest.StoriesBean> mStories;
+    private List<StoriesBean> mStories;
+    private Themes mThemes;
     private TopStoriesAdapter topAdapter;
     private StoriesAdapter storiesAdapter;
     private RecyclerView mRecyclerView;
     private SparseArray<String> mDateHeaders;
     private int dateBeforeToday;
+    private int themeCurrent = -1;
 
     private void onCreate() {
         findViewById(R.id.content_main);
         setTitle("首页");
         initView();
         initDatas();
+        initNavigationView();
     }
 
     private void initView() {
         //ViewPager
-        View headerLayout = LayoutInflater.from(this).inflate(R.layout.layout_header, null);
-        mViewPager = (ViewPager) headerLayout.findViewById(R.id.viewPager);
+        mHeaderLayout = LayoutInflater.from(this).inflate(R.layout.layout_header, null);
+        ViewPager mViewPager = (ViewPager) mHeaderLayout.findViewById(R.id.viewPager);
         mViewPager.getLayoutParams().height = ScreenUtils.getScreenHeight(this) / 3;
-        mIndicator = (PageIndicatorView) headerLayout.findViewById(R.id.pageIndicatorView);
+        mIndicator = (PageIndicatorView) mHeaderLayout.findViewById(R.id.pageIndicatorView);
         topAdapter = new TopStoriesAdapter(this);
         mViewPager.setAdapter(topAdapter);
         //RecyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_newest);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         storiesAdapter = new StoriesAdapter(this);
-        storiesAdapter.addHeaderView(headerLayout);
+        storiesAdapter.addHeaderView(mHeaderLayout);
+        storiesAdapter.setOnLoadMoreListener(getLoadMoreListener());
         mRecyclerView.setAdapter(storiesAdapter);
         mRecyclerView.addOnScrollListener(new RecyclerViewListener(this));
-        storiesAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+        mRecyclerView.addOnItemTouchListener(new OnItemClickListener() {
             @Override
-            public void onLoadMoreRequested() {
-                getNewsBefore();
+            public void SimpleOnItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
+                NewsDetailActivity.Lunch(MainActivity.this, storiesAdapter.getData(), i);
             }
         });
     }
@@ -185,6 +194,25 @@ public class MainActivity extends AppCompatActivity
         mDateHeaders = new SparseArray<>();
         mDateHeaders.put(-1, "首页");
         getNewsToday();
+    }
+
+    private void initNavigationView() {
+        String icon = "http://pic1.zhimg.com/da8e974dc_im.jpg";
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerIcon = navigationView.getHeaderView(0).findViewById(R.id.nav_header_icon);
+        Glide.with(this).load(icon).transform(new GlideCircleTransform(this)).into((ImageView) headerIcon);
+        final Menu menu = navigationView.getMenu();
+        ZhiHuHttpHelper.getInstance().getThemes()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .retry(2)
+                .subscribe(new Action1<Themes>() {
+                    @Override
+                    public void call(Themes themes) {
+                        mThemes = themes;
+                        updateNavMenu(menu, mThemes);
+                    }
+                });
     }
 
     private void getNewsToday() {
@@ -213,9 +241,9 @@ public class MainActivity extends AppCompatActivity
                         //最新新闻
                         mStories = new ArrayList<>();
                         String today = "今日要闻";
-                        mStories.add(new NewsLatest.StoriesBean(today, true));
-                        List<NewsLatest.StoriesBean> stories = latest.getStories();
-                        for (NewsLatest.StoriesBean story : stories) {
+                        mStories.add(new StoriesBean(today, true));
+                        List<StoriesBean> stories = latest.getStories();
+                        for (StoriesBean story : stories) {
                             story.setHeaderDate(today);
                         }
                         mStories.addAll(stories);
@@ -256,7 +284,8 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressLint("SimpleDateFormat")
     private void addNewsBefore(NewsBefore newsBefore) {
-        List<NewsLatest.StoriesBean> newStories = new ArrayList<>();
+        storiesAdapter.hideLoadingMore();
+        List<StoriesBean> newStories = new ArrayList<>();
         String dateStr = newsBefore.getDate();
         Calendar calendar = Calendar.getInstance();
         Date date;
@@ -265,21 +294,110 @@ public class MainActivity extends AppCompatActivity
             date = new SimpleDateFormat("yyyyMMdd").parse(dateStr);
             calendar.setTime(date);
             result = new SimpleDateFormat("MM月dd日 " + getDayOfWeek(calendar)).format(date);
-            newStories.add(new NewsLatest.StoriesBean(result, true));
+            newStories.add(new StoriesBean(result, true));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        List<NewsLatest.StoriesBean> stories = newsBefore.getStories();
+        List<StoriesBean> stories = newsBefore.getStories();
         if (stories.size() > 0) {
             dateBeforeToday++;
         }
-        for (NewsLatest.StoriesBean story : stories) {
+        for (StoriesBean story : stories) {
             story.setHeaderDate(result);
         }
         mDateHeaders.put(mStories.size() - 1, newStories.get(0).getHeaderDate());
         newStories.addAll(stories);
         mStories.addAll(newStories);
         storiesAdapter.addData(newStories);
+    }
+
+    private void updateNavMenu(Menu menu, Themes themes) {
+        for (int i = 0; i < themes.getOthers().size(); i++) {
+            Themes.OthersBean theme = themes.getOthers().get(i);
+            menu.add(1, i, i, theme.getName());
+            final MenuItem menuItem = menu.getItem(i + 1);
+            Glide.with(MainActivity.this)
+                    .load(theme.getThumbnail())
+                    .placeholder(R.drawable.menu_avatar)
+                    .transform(new GlideCircleTransform(MainActivity.this))
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            menuItem.setIcon(resource);
+                            return false;
+                        }
+                    })
+                    .into(ConvertUtils.dp2px(MainActivity.this, 64), ConvertUtils.dp2px(MainActivity.this, 64));
+        }
+    }
+
+    private void themeSelected(int themePosition) {
+        if (themePosition == -1) {
+            storiesAdapter.removeAllHeaderView();
+            storiesAdapter.addHeaderView(mHeaderLayout);
+            storiesAdapter.setOnLoadMoreListener(getLoadMoreListener());
+            storiesAdapter.setNewData(mStories);
+            mRecyclerView.scrollToPosition(0);
+            setTitle("主页");
+            return;
+        }
+        storiesAdapter.setOnLoadMoreListener(null);
+        ZhiHuHttpHelper.getInstance().getTheme(mThemes.getOthers().get(themePosition).getId())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .retry(2)
+                .subscribe(new Subscriber<Theme>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(MainActivity.this, "获取主题内容列表失败", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "onError: ", e);
+                    }
+
+                    @Override
+                    public void onNext(Theme theme) {
+                        switchTheme(theme);
+                    }
+                });
+
+    }
+
+    private void switchTheme(Theme theme) {
+        if (mThemeHeader == null) {
+            mThemeHeader = new ThemeHeader(this);
+        }
+        ThemeEditorView mEditorView = new ThemeEditorView(this, theme.getEditors());
+        setTitle(theme.getName());
+        mThemeHeader.setText(theme.getDescription());
+        Glide.with(this).load(theme.getImage()).into(mThemeHeader.getImageView());
+        storiesAdapter.removeAllHeaderView();
+        storiesAdapter.addHeaderView(mThemeHeader.getView());
+        storiesAdapter.addHeaderView(mEditorView);
+        storiesAdapter.setNewData(theme.getStories());
+        mRecyclerView.scrollToPosition(0);
+    }
+
+    public void setTitle(String title) {
+        if (title.equals("首页") && themeCurrent != -1) return;
+        super.setTitle(title);
+    }
+
+    private BaseQuickAdapter.RequestLoadMoreListener getLoadMoreListener() {
+        return new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                getNewsBefore();
+            }
+        };
     }
 
     private String getDayOfWeek(Calendar calendar) {
