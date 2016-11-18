@@ -31,7 +31,7 @@ public class NewestStoryView extends CardView {
         LayoutInflater.from(context).inflate(R.layout.layout_newest_story, this);
         setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         FrameLayout.LayoutParams layoutParams = (LayoutParams) getLayoutParams();
-        layoutParams.setMargins(eightDp, eightDp, eightDp, eightDp);
+        layoutParams.setMargins(eightDp, 0, eightDp, eightDp);
         setMinimumHeight(ConvertUtils.dp2px(mContext, 80));
         init();
     }
