@@ -1,7 +1,11 @@
 package com.kent.zhifoudaily.ui.view;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.support.v7.widget.CardView;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -11,8 +15,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.kent.zhifoudaily.R;
 import com.kent.zhifoudaily.entity.StoriesBean;
+import com.kent.zhifoudaily.event.ToggleNightMode;
 import com.kent.zhifoudaily.utils.ConvertUtils;
 import com.kent.zhifoudaily.utils.ScreenUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 
@@ -47,7 +55,7 @@ public class NewestStoryView extends CardView {
         this.multiPic.setVisibility(isMultiPic ? VISIBLE : INVISIBLE);
     }
 
-    public void setData(StoriesBean data) {
+    public void setData(StoriesBean data, ToggleNightMode mode) {
         List<String> images = data.getImages();
         if (images != null) {
             String string = images.get(0);
@@ -58,5 +66,9 @@ public class NewestStoryView extends CardView {
         }
         mTitle.setText(data.getTitle());
         isMultiPic(data.isMultipic());
+        if (mode != null) {
+            mTitle.setTextColor(mode.attrs.textColorLight);
+            setCardBackgroundColor(mode.attrs.cvBackGroundColor);
+        }
     }
 }

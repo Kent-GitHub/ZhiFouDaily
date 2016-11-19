@@ -48,6 +48,7 @@ public class CommentActivity extends AppCompatActivity {
         }
         initView();
         initDatas();
+
     }
 
     public static void Launch(Activity from, int newsId) {

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="navBarColorEnd" format="color" />
+    <attr name="navBarColorStart" format="color" />
+    <attr name="navBarColorCenter" format="color" />
+    <attr name="modeTextColorDark" format="color" />
+    <attr name="modeTextColorLight" format="color" />
+    <attr name="modeBackGroundColor" format="color" />
+    <attr name="modeCvBackGroundColor" format="color" />
+</resources>

@@ -1,6 +1,9 @@
 package com.kent.zhifoudaily.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,18 +37,22 @@ import com.kent.zhifoudaily.R;
 import com.kent.zhifoudaily.adapter.GlideCircleTransform;
 import com.kent.zhifoudaily.adapter.StoriesAdapter;
 import com.kent.zhifoudaily.adapter.TopStoriesAdapter;
+import com.kent.zhifoudaily.entity.AttrsValueHolder;
 import com.kent.zhifoudaily.entity.NewsBefore;
 import com.kent.zhifoudaily.entity.NewsLatest;
 import com.kent.zhifoudaily.entity.StoriesBean;
 import com.kent.zhifoudaily.entity.Theme;
 import com.kent.zhifoudaily.entity.Themes;
+import com.kent.zhifoudaily.event.ToggleNightMode;
 import com.kent.zhifoudaily.retrofit.ZhiHuHttpHelper;
 import com.kent.zhifoudaily.ui.view.ThemeEditorView;
 import com.kent.zhifoudaily.ui.view.ThemeHeader;
-import com.kent.zhifoudaily.ui.view.RecyclerViewListener;
+import com.kent.zhifoudaily.utils.BarUtils;
 import com.kent.zhifoudaily.utils.ConvertUtils;
 import com.kent.zhifoudaily.utils.ScreenUtils;
 import com.rd.PageIndicatorView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,7 +64,6 @@ import java.util.List;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity
@@ -72,18 +78,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
-                if (mRecyclerView != null) {
-                    mRecyclerView.scrollToPosition(0);
-                }
+                if (mRecyclerView != null) mRecyclerView.scrollToPosition(0);
             }
         });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -101,6 +102,8 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (newsThemeCurrent != -1) {
+            newsThemeSelected(-1);
         } else {
             super.onBackPressed();
         }
@@ -123,6 +126,8 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_toggleNight) {
+            toggleNightMode();
         }
 
         return super.onOptionsItemSelected(item);
@@ -132,11 +137,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getGroupId() == 1) {
-            themeCurrent = item.getItemId();
-            themeSelected(item.getItemId());
+            newsThemeSelected(item.getItemId());
         } else if (item.getItemId() == R.id.nav_menu_home) {
-            themeCurrent = -1;
-            themeSelected(-1);
+            newsThemeSelected(-1);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -145,10 +148,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private static final String TAG = "MainActivity";
+    private View navHeader;
     private View mHeaderLayout;
     private ThemeHeader mThemeHeader;
     private PageIndicatorView mIndicator;
+    private NavigationView navigationView;
     private List<NewsLatest.TopStoriesBean> mTopStories;
+    private FloatingActionButton mFab;
     private List<StoriesBean> mStories;
     private Themes mThemes;
     private TopStoriesAdapter topAdapter;
@@ -156,7 +162,8 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private SparseArray<String> mDateHeaders;
     private int dateBeforeToday;
-    private int themeCurrent = -1;
+    private int newsThemeCurrent = -1;
+    private boolean isNightMode;
 
     private void onCreate() {
         findViewById(R.id.content_main);
@@ -188,6 +195,8 @@ public class MainActivity extends AppCompatActivity
                 NewsDetailActivity.Lunch(MainActivity.this, storiesAdapter.getData(), i);
             }
         });
+        //eventBus
+        EventBus.getDefault().register(storiesAdapter);
     }
 
     private void initDatas() {
@@ -198,21 +207,33 @@ public class MainActivity extends AppCompatActivity
 
     private void initNavigationView() {
         String icon = "http://pic1.zhimg.com/da8e974dc_im.jpg";
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View headerIcon = navigationView.getHeaderView(0).findViewById(R.id.nav_header_icon);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navHeader = navigationView.getHeaderView(0);
+        View headerIcon = navHeader.findViewById(R.id.nav_header_icon);
         Glide.with(this).load(icon).transform(new GlideCircleTransform(this)).into((ImageView) headerIcon);
         final Menu menu = navigationView.getMenu();
         ZhiHuHttpHelper.getInstance().getThemes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(2)
-                .subscribe(new Action1<Themes>() {
-                    @Override
-                    public void call(Themes themes) {
-                        mThemes = themes;
-                        updateNavMenu(menu, mThemes);
-                    }
-                });
+                .subscribe(new Subscriber<Themes>() {
+                               @Override
+                               public void onCompleted() {
+
+                               }
+
+                               @Override
+                               public void onError(Throwable e) {
+                                   Log.w(TAG, "onError_getThemes: ", e);
+                               }
+
+                               @Override
+                               public void onNext(Themes themes) {
+                                   mThemes = themes;
+                                   updateNavMenu(menu, mThemes);
+                               }
+                           }
+                );
     }
 
     private void getNewsToday() {
@@ -228,7 +249,7 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.w(TAG, "onError: ", e);
+                        Log.w(TAG, "onError_getNewsToday: ", e);
                         Toast.makeText(MainActivity.this, "更新失败，请检查网络", Toast.LENGTH_SHORT).show();
                     }
 
@@ -271,7 +292,7 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.w(TAG, "onError: ", e);
+                        Log.w(TAG, "onError_getNewsBefore: ", e);
                         Toast.makeText(MainActivity.this, "更新失败，请检查网络", Toast.LENGTH_SHORT).show();
                     }
 
@@ -336,7 +357,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void themeSelected(int themePosition) {
+    private void newsThemeSelected(int themePosition) {
+        newsThemeCurrent = themePosition;
         if (themePosition == -1) {
             storiesAdapter.removeAllHeaderView();
             storiesAdapter.addHeaderView(mHeaderLayout);
@@ -360,7 +382,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onError(Throwable e) {
                         Toast.makeText(MainActivity.this, "获取主题内容列表失败", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "onError: ", e);
+                        Log.e(TAG, "onError_themeSelected: ", e);
                     }
 
                     @Override
@@ -387,8 +409,40 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setTitle(String title) {
-        if (title.equals("首页") && themeCurrent != -1) return;
+        if (title.equals("首页") && newsThemeCurrent != -1) return;
         super.setTitle(title);
+    }
+
+    private void toggleNightMode() {
+        if (isNightMode) {
+            setTheme(R.style.AppTheme_DayTheme);
+        } else {
+            setTheme(R.style.AppTheme_NightTheme);
+        }
+        isNightMode = !isNightMode;
+        refreshUI();
+    }
+
+    private void refreshUI() {
+        AttrsValueHolder attrs = new AttrsValueHolder(this);
+        //
+        mRecyclerView.setBackgroundColor(attrs.backGroundColor);
+        //
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(attrs.colorPrimary));
+        //
+        if (isNightMode) navHeader.setBackgroundResource(R.drawable.side_nav_bar_night);
+        else navHeader.setBackgroundResource(R.drawable.side_nav_bar_day);
+        //
+        navigationView.setBackgroundColor(attrs.cvBackGroundColor);
+        //
+        EventBus.getDefault().post(new ToggleNightMode(isNightMode, attrs));
+        storiesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(storiesAdapter);
     }
 
     private BaseQuickAdapter.RequestLoadMoreListener getLoadMoreListener() {
@@ -421,6 +475,37 @@ public class MainActivity extends AppCompatActivity
             return "星期天";
         } else {
             return "星期" + dayOfWeek;
+        }
+    }
+
+    class RecyclerViewListener extends RecyclerView.OnScrollListener {
+        private int lastPosition;
+        private MainActivity activity;
+
+        RecyclerViewListener(Activity activity) {
+            this.activity = (MainActivity) activity;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+            StoriesAdapter mAdapter = (StoriesAdapter) recyclerView.getAdapter();
+            int position = layoutManager.findFirstVisibleItemPosition() - mAdapter.getHeaderLayoutCount();
+            List<StoriesBean> data = mAdapter.getData();
+            if (data.size() == 0) return;
+            if (lastPosition != position) {
+                if (position < 0) {
+                    activity.setTitle("首页");
+                } else if (data.get(position).getHeaderDate() != null) {
+                    activity.setTitle(data.get(position).getHeaderDate());
+                }
+                if (position <= 3) {
+                    mFab.setVisibility(View.GONE);
+                } else {
+                    mFab.setVisibility(View.VISIBLE);
+                }
+            }
+            lastPosition = position;
         }
     }
 }

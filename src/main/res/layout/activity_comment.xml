@@ -11,10 +11,10 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:fitsSystemWindows="true"
             android:id="@+id/comment_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         </android.support.v7.widget.Toolbar>
@@ -23,7 +23,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/comment_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="?attr/modeBackGroundColor" />
 
     <TextView
         android:id="@+id/comment_noComment"
@@ -32,6 +33,7 @@
         android:gravity="center"
         android:padding="16dp"
         android:text="@string/no_comment_yet"
+        android:textColor="?attr/modeTextColorDark"
         android:textSize="18sp"
         android:visibility="gone" />
 

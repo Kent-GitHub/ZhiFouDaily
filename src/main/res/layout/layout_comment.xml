@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
+    android:background="?attr/modeBackGroundColor"
     android:orientation="vertical">
 
     <ImageView
@@ -19,7 +20,7 @@
         android:layout_marginStart="8dp"
         android:layout_toEndOf="@id/comment_avatar"
         android:text="佚名"
-        android:textColor="#000"
+        android:textColor="?attr/modeTextColorDark"
         android:textSize="17sp"
         android:textStyle="bold" />
 
@@ -39,7 +40,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="这是一条评论"
-            android:textColor="#333"
+            android:textColor="?attr/modeTextColorLight"
             android:textSize="16sp" />
 
         <TextView
@@ -50,7 +51,7 @@
             android:layout_marginStart="4dp"
             android:padding="4dp"
             android:text="被回复的评论"
-            android:textColor="#000"
+            android:textColor="?attr/modeTextColorDark"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -62,7 +63,8 @@
         android:layout_above="@id/comment_contents"
         android:layout_alignParentEnd="true"
         android:drawableStart="@drawable/like"
-        android:text="13" />
+        android:text="13"
+        android:textColor="?attr/modeTextColorLight" />
 
 
     <TextView
@@ -72,6 +74,7 @@
         android:layout_below="@id/comment_contents"
         android:layout_marginStart="8dp"
         android:layout_toEndOf="@id/comment_avatar"
-        android:text="MM-dd HH:mm" />
+        android:text="MM-dd HH:mm"
+        android:textColor="?attr/modeTextColorLight" />
 
 </RelativeLayout>

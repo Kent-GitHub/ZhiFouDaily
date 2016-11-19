@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,13 +30,13 @@ public class EntryActivity extends Activity {
 
     private static final String TAG = "EntryActivity";
 
-//    private static final int animationTime = 2000;
-    private static final int animationTime = 2000;
+    //    private static final int animationTime = 2000;
+    private static final int animationTime = 200;
 
     private static final float scaleMax = 1.13F;
 
+    private static final int delayTime = 100;
 //    private static final int delayTime = 1000;
-    private static final int delayTime = 1;
 
     private ImageView mImageView;
     private TextView mTextView;
@@ -44,7 +45,7 @@ public class EntryActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS|WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         getLauncherImage();
 
         mImageView = (ImageView) findViewById(R.id.iv_splash);
@@ -59,7 +60,8 @@ public class EntryActivity extends Activity {
                 .doOnTerminate(new Action0() {
                     @Override
                     public void call() {
-                        mHandler.sendEmptyMessageDelayed(0,delayTime);
+                        mHandler.sendEmptyMessageDelayed(0, delayTime);
+                        mHandler.sendEmptyMessageDelayed(1, delayTime + animationTime);
                     }
                 })
                 .subscribe(new Subscriber<StartImage>() {
@@ -91,27 +93,24 @@ public class EntryActivity extends Activity {
         public boolean handleMessage(Message msg) {
             if (msg.what == 0) {
                 startImageAnimation();
+            } else if (msg.what == 1) {
+                startActivity(new Intent(EntryActivity.this, MainActivity.class));
+                EntryActivity.this.finish();
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
             return false;
         }
     });
 
-    private void startImageAnimation(){
-        ObjectAnimator animatorX = ObjectAnimator.ofFloat(mImageView, "scaleX", 1f, scaleMax);
-        ObjectAnimator animatorY = ObjectAnimator.ofFloat(mImageView, "scaleY", 1f, scaleMax);
+    private void startImageAnimation() {
+        PropertyValuesHolder holderX = PropertyValuesHolder.ofFloat("scaleX", 1f, scaleMax);
+        PropertyValuesHolder holderY = PropertyValuesHolder.ofFloat("scaleY", 1f, scaleMax);
+        ObjectAnimator.ofPropertyValuesHolder(mImageView, holderX, holderY).setDuration(animationTime).start();
+    }
 
-        AnimatorSet set = new AnimatorSet();
-        set.setDuration(animationTime).play(animatorX).with(animatorY);
-        set.start();
+    @Override
+    public void onBackPressed() {
 
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                startActivity(new Intent(EntryActivity.this, MainActivity.class));
-                EntryActivity.this.finish();
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-            }
-        });
     }
 
     @Override

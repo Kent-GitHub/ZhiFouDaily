@@ -1,11 +1,37 @@
 <resources>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="AppTheme.DayTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@android:color/holo_red_light</item>
         <item name="colorPrimaryDark">@android:color/holo_red_dark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="modeTextColorDark">#ff000000</item>
+        <item name="modeTextColorLight">#ff666666</item>
+        <item name="modeBackGroundColor">#fff3f3f3</item>
+        <item name="modeCvBackGroundColor">#ffffffff</item>
+        <item name="navBarColorCenter">#ffff6d2f</item>
+        <item name="navBarColorEnd">#ffe00032</item>
+        <item name="navBarColorStart">#ffff7997</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="AppTheme.NightTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@android:color/holo_red_light</item>
+        <item name="colorPrimaryDark">@android:color/holo_red_dark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="modeTextColorDark">#ffffffff</item>
+        <item name="modeTextColorLight">#ff888888</item>
+        <item name="modeBackGroundColor">#ff343434</item>
+        <item name="modeCvBackGroundColor">#ff404040</item>
+        <item name="navBarColorCenter">#ff252525</item>
+        <item name="navBarColorEnd">#ff252525</item>
+        <item name="navBarColorStart">#ff252525</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
 </resources>

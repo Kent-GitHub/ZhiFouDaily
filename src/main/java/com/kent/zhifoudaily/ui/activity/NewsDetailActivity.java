@@ -62,7 +62,6 @@ public class NewsDetailActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
         setContentView(R.layout.activity_news_detail);
-        EventBus.getDefault().register(this);
         setSupportActionBar((Toolbar) findViewById(R.id.news_detail_toolBar));
         mActionBar = getSupportActionBar();
         if (mActionBar != null) {
