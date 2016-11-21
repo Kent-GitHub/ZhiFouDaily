@@ -3,8 +3,10 @@ package com.kent.zhifoudaily.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +23,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.kent.zhifoudaily.R;
+import com.kent.zhifoudaily.application.MyApplication;
+import com.kent.zhifoudaily.entity.AttrsValueHolder;
 import com.kent.zhifoudaily.entity.News;
 import com.kent.zhifoudaily.entity.NewsLatest;
 import com.kent.zhifoudaily.entity.StoriesBean;
@@ -70,10 +74,11 @@ public class NewsDetailActivity extends AppCompatActivity {
         }
         newsId = getIntent().getIntExtra("newsId", -1);
         requestNews(newsId);
-        initView();
+        AttrsValueHolder attrs = MyApplication.getAttrs();
+        initView(attrs);
     }
 
-    private void initView() {
+    private void initView(AttrsValueHolder attrs) {
         mTitle = (TextView) findViewById(R.id.news_detail_title);
         mWebView = (WebView) findViewById(R.id.news_detail_webView);
         mImageView = (ImageView) findViewById(R.id.news_detail_image);
@@ -83,6 +88,10 @@ public class NewsDetailActivity extends AppCompatActivity {
         }
         mImageView.getLayoutParams().height = imageHeight;
         mImageSource = (TextView) findViewById(R.id.news_detail_image_source);
+        //ActionBar toolBar
+        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.news_detail_ToolbarLayout);
+        toolbarLayout.setContentScrim(new ColorDrawable(attrs.colorPrimary));
+        BarUtils.setColor(this,attrs.colorPrimaryDark);
     }
 
     public static void Lunch(Activity from, List<StoriesBean> mStories, int current) {

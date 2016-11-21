@@ -18,7 +18,9 @@ import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.kent.zhifoudaily.R;
+import com.kent.zhifoudaily.entity.AttrsValueHolder;
 import com.kent.zhifoudaily.entity.Comment;
+import com.kent.zhifoudaily.ui.activity.CommentActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,8 +32,11 @@ public class CommentAdapter extends BaseQuickAdapter<Comment.CommentsBean, BaseV
         super(layoutResId, data);
     }
 
-    public CommentAdapter(Context context) {
+    private AttrsValueHolder mAttrs;
+
+    public CommentAdapter(Context context, AttrsValueHolder attrs) {
         this(R.layout.layout_comment, new ArrayList<Comment.CommentsBean>());
+        mAttrs = attrs;
         mContext = context;
     }
 
@@ -41,9 +46,13 @@ public class CommentAdapter extends BaseQuickAdapter<Comment.CommentsBean, BaseV
     protected void convert(BaseViewHolder baseViewHolder, Comment.CommentsBean comments) {
         baseViewHolder
                 .setText(R.id.comment_userName, comments.getAuthor())
+                .setTextColor(R.id.comment_userName, mAttrs.textColorDark)
                 .setText(R.id.comment_content, comments.getContent())
+                .setTextColor(R.id.comment_content, mAttrs.textColorLight)
                 .setText(R.id.comment_likes, " " + comments.getLikes())
-                .setText(R.id.comment_time, getConcertTime(comments.getTime() * 1000));
+                .setTextColor(R.id.comment_likes, mAttrs.textColorLight)
+                .setText(R.id.comment_time, getConcertTime(comments.getTime() * 1000))
+                .setTextColor(R.id.comment_time, mAttrs.textColorLight);
         ImageView icon = baseViewHolder.getView(R.id.comment_avatar);
         Glide.with(mContext).load(comments.getAvatar()).transform(new GlideCircleTransform(mContext)).into(icon);
         Comment.CommentsBean.ReplyToBean replyTo = comments.getReply_to();
@@ -53,7 +62,7 @@ public class CommentAdapter extends BaseQuickAdapter<Comment.CommentsBean, BaseV
             if (replyTo.getStatus() == 3) {
                 toStr = replyTo.getError_msg();
             }
-            to.setBackgroundColor(0xfff0f0f0);
+            to.setTextColor(mAttrs.textColorDark);
             to.setText(Html.fromHtml(toStr));
             to.setVisibility(View.VISIBLE);
         } else {

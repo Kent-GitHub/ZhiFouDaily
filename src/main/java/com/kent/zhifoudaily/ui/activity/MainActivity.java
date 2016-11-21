@@ -1,8 +1,13 @@
 package com.kent.zhifoudaily.ui.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -37,6 +43,7 @@ import com.kent.zhifoudaily.R;
 import com.kent.zhifoudaily.adapter.GlideCircleTransform;
 import com.kent.zhifoudaily.adapter.StoriesAdapter;
 import com.kent.zhifoudaily.adapter.TopStoriesAdapter;
+import com.kent.zhifoudaily.application.MyApplication;
 import com.kent.zhifoudaily.entity.AttrsValueHolder;
 import com.kent.zhifoudaily.entity.NewsBefore;
 import com.kent.zhifoudaily.entity.NewsLatest;
@@ -171,6 +178,7 @@ public class MainActivity extends AppCompatActivity
         initView();
         initDatas();
         initNavigationView();
+        refreshUI();
     }
 
     private void initView() {
@@ -416,15 +424,42 @@ public class MainActivity extends AppCompatActivity
     private void toggleNightMode() {
         if (isNightMode) {
             setTheme(R.style.AppTheme_DayTheme);
+            getApplication().setTheme(R.style.AppTheme_DayTheme);
         } else {
             setTheme(R.style.AppTheme_NightTheme);
+            getApplication().setTheme(R.style.AppTheme_NightTheme);
         }
         isNightMode = !isNightMode;
+        modeSwitchAnimation();
         refreshUI();
+    }
+
+    private void modeSwitchAnimation() {
+        final View decorView = getWindow().getDecorView();
+        Bitmap cacheBitmap = getCacheBitmapFromView(decorView);
+        if (decorView instanceof ViewGroup && cacheBitmap != null) {
+            final ImageView view = new ImageView(this);
+            //view.setBackgroundDrawable(new BitmapDrawable(getResources(), cacheBitmap));
+            view.setImageBitmap(cacheBitmap);
+            ViewGroup.LayoutParams layoutParam = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+            ((ViewGroup) decorView).addView(view, layoutParam);
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+            objectAnimator.setDuration(300);
+            objectAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    ((ViewGroup) decorView).removeView(view);
+                }
+            });
+            objectAnimator.start();
+        }
     }
 
     private void refreshUI() {
         AttrsValueHolder attrs = new AttrsValueHolder(this);
+        MyApplication.setAttrs(attrs);
         //
         mRecyclerView.setBackgroundColor(attrs.backGroundColor);
         //
@@ -435,8 +470,30 @@ public class MainActivity extends AppCompatActivity
         //
         navigationView.setBackgroundColor(attrs.cvBackGroundColor);
         //
+        if (isNightMode)
+            navigationView.setItemTextColor(getResources().getColorStateList(R.color.nav_item_bg_night));
+        else
+            navigationView.setItemTextColor(getResources().getColorStateList(R.color.nav_item_bg_day));
+        //statusBar
+        BarUtils.setColor(this,attrs.colorPrimary);
+        //To storiesAdapter
         EventBus.getDefault().post(new ToggleNightMode(isNightMode, attrs));
         storiesAdapter.notifyDataSetChanged();
+    }
+
+    private Bitmap getCacheBitmapFromView(View view) {
+        final boolean drawingCacheEnabled = true;
+        view.setDrawingCacheEnabled(drawingCacheEnabled);
+        view.buildDrawingCache(drawingCacheEnabled);
+        final Bitmap drawingCache = view.getDrawingCache();
+        Bitmap bitmap;
+        if (drawingCache != null) {
+            bitmap = Bitmap.createBitmap(drawingCache);
+            view.setDrawingCacheEnabled(false);
+        } else {
+            bitmap = null;
+        }
+        return bitmap;
     }
 
     @Override

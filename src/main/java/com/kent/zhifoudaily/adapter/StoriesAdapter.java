@@ -42,8 +42,7 @@ public class StoriesAdapter extends BaseQuickAdapter<StoriesBean, BaseViewHolder
             ((NewestStoryView) baseViewHolder.getConvertView()).setData(storiesBean, mode);
         } else {
             ((TextView) baseViewHolder.getConvertView()).setText(storiesBean.getHeaderDate());
-            if (mode != null)
-                ((TextView) baseViewHolder.getConvertView()).setTextColor(mode.attrs.textColorDark);
+            if (mode != null) ((TextView) baseViewHolder.getConvertView()).setTextColor(mode.attrs.textColorLight);
         }
     }
 

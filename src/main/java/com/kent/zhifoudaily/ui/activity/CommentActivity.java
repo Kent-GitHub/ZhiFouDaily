@@ -3,6 +3,7 @@ package com.kent.zhifoudaily.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 
 import com.kent.zhifoudaily.R;
 import com.kent.zhifoudaily.adapter.CommentAdapter;
+import com.kent.zhifoudaily.application.MyApplication;
+import com.kent.zhifoudaily.entity.AttrsValueHolder;
 import com.kent.zhifoudaily.entity.Comment;
 import com.kent.zhifoudaily.retrofit.ZhiHuHttpHelper;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
@@ -34,6 +37,7 @@ public class CommentActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private CommentAdapter mAdapter;
+    private AttrsValueHolder mAttrs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +50,10 @@ public class CommentActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        mAttrs= MyApplication.getAttrs();
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(mAttrs.colorPrimary));
         initView();
         initDatas();
-
     }
 
     public static void Launch(Activity from, int newsId) {
@@ -64,11 +69,12 @@ public class CommentActivity extends AppCompatActivity {
 
     private void initDatas() {
         getCommentById(getIntent().getIntExtra("newsId", -1));
-        mAdapter = new CommentAdapter(this);
+        mAdapter = new CommentAdapter(this, mAttrs);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this)
-                .color(0xffcdcdcd).size(2).build());
+                .color(mAttrs.cvBackGroundColor).size(2).build());
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setBackgroundColor(mAttrs.backGroundColor);
     }
 
     private void getCommentById(int id) {
@@ -117,9 +123,9 @@ public class CommentActivity extends AppCompatActivity {
 
     private void updateComment(List<Comment.CommentsBean> comments) {
         if (comments == null) return;
-        if (comments.size()==0){
+        if (comments.size() == 0) {
             findViewById(R.id.comment_noComment).setVisibility(View.VISIBLE);
-        }else {
+        } else {
             findViewById(R.id.comment_noComment).setVisibility(View.GONE);
         }
         setTitle(comments.size() + "条点论");
@@ -128,7 +134,7 @@ public class CommentActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 break;

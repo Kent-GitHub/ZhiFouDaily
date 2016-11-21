@@ -2,10 +2,12 @@ package com.kent.zhifoudaily.entity;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.util.Log;
 
 import com.kent.zhifoudaily.R;
 
 public class AttrsValueHolder {
+    private static final String TAG = "AttrsValueHolder";
     public int textColorDark;
     public int textColorLight;
     public int backGroundColor;

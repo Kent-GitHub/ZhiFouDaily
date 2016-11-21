@@ -25,7 +25,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.List;
 
 public class NewestStoryView extends CardView {
-
+    private static final String TAG = NewestStoryView.class.getName();
     private ImageView mImageView;
     private TextView mTitle, multiPic;
 
@@ -67,7 +67,7 @@ public class NewestStoryView extends CardView {
         mTitle.setText(data.getTitle());
         isMultiPic(data.isMultipic());
         if (mode != null) {
-            mTitle.setTextColor(mode.attrs.textColorLight);
+            mTitle.setTextColor(mode.attrs.textColorDark);
             setCardBackgroundColor(mode.attrs.cvBackGroundColor);
         }
     }

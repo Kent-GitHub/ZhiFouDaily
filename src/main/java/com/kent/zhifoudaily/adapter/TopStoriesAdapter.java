@@ -82,7 +82,6 @@ public class TopStoriesAdapter extends PagerAdapter {
             story.setImages(images);
             stories.add(story);
         }
-        Log.e("Test", "convertToStories_mTopStories: "+mTopStories.size()+" ,stories: "+stories.size() );
         return stories;
     }
 }

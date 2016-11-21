@@ -23,7 +23,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="modeTextColorDark">#ffffffff</item>
-        <item name="modeTextColorLight">#ff888888</item>
+        <item name="modeTextColorLight">#ff999999</item>
         <item name="modeBackGroundColor">#ff343434</item>
         <item name="modeCvBackGroundColor">#ff404040</item>
         <item name="navBarColorCenter">#ff252525</item>
