@@ -474,8 +474,6 @@ public class MainActivity extends AppCompatActivity
             navigationView.setItemTextColor(getResources().getColorStateList(R.color.nav_item_bg_night));
         else
             navigationView.setItemTextColor(getResources().getColorStateList(R.color.nav_item_bg_day));
-        //statusBar
-        BarUtils.setColor(this,attrs.colorPrimary);
         //To storiesAdapter
         EventBus.getDefault().post(new ToggleNightMode(isNightMode, attrs));
         storiesAdapter.notifyDataSetChanged();

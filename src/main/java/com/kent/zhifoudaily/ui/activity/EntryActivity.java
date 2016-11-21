@@ -30,13 +30,13 @@ public class EntryActivity extends Activity {
 
     private static final String TAG = "EntryActivity";
 
-    //    private static final int animationTime = 2000;
-    private static final int animationTime = 200;
+        private static final int animationTime = 2000;
+//    private static final int animationTime = 200;
 
     private static final float scaleMax = 1.13F;
 
-    private static final int delayTime = 100;
-//    private static final int delayTime = 1000;
+//    private static final int delayTime = 100;
+    private static final int delayTime = 1000;
 
     private ImageView mImageView;
     private TextView mTextView;

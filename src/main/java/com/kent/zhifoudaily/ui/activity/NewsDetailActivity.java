@@ -72,10 +72,9 @@ public class NewsDetailActivity extends AppCompatActivity {
             mActionBar.setDisplayHomeAsUpEnabled(true);
             mActionBar.setDisplayShowTitleEnabled(true);
         }
-        newsId = getIntent().getIntExtra("newsId", -1);
-        requestNews(newsId);
         AttrsValueHolder attrs = MyApplication.getAttrs();
         initView(attrs);
+        EventBus.getDefault().register(this);
     }
 
     private void initView(AttrsValueHolder attrs) {
@@ -91,7 +90,6 @@ public class NewsDetailActivity extends AppCompatActivity {
         //ActionBar toolBar
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.news_detail_ToolbarLayout);
         toolbarLayout.setContentScrim(new ColorDrawable(attrs.colorPrimary));
-        BarUtils.setColor(this,attrs.colorPrimaryDark);
     }
 
     public static void Lunch(Activity from, List<StoriesBean> mStories, int current) {
@@ -99,7 +97,16 @@ public class NewsDetailActivity extends AppCompatActivity {
         intent.putExtra("newsId", mStories.get(current).getId());
         from.startActivity(intent);
         EventBus.getDefault().postSticky(new ShowStories(mStories, current));
-        Log.e(TAG, "Lunch: post it.");
+    }
+
+    @Subscribe(sticky = true)
+    public void onReceiveStories(ShowStories showStories) {
+        mStories = showStories.getStories();
+        currentPage = showStories.getCurrent();
+        StoriesBean story = mStories.get(currentPage);
+        mTitle.setText(story.getTitle());
+        newsId = story.getId();
+        requestNews(newsId);
     }
 
     @Override
@@ -124,17 +131,6 @@ public class NewsDetailActivity extends AppCompatActivity {
                 break;
         }
         return true;
-    }
-
-    @Subscribe
-    public void onReceiveStories(ShowStories showStories) {
-        // TODO: 2016/11/5 并不能收到
-        Log.e(TAG, "onReceiveStories: get stories.");
-        mStories = showStories.getStories();
-        currentPage = showStories.getCurrent();
-        StoriesBean story = mStories.get(currentPage);
-        mTitle.setText(story.getTitle());
-        requestNews(story.getId());
     }
 
     private void requestNews(int id) {
